@@ -312,46 +312,78 @@ body {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(6px);
 }
-/* Mic Listening States */
-.mic-listening {
-    animation: pulse 1.5s infinite;
+/* Mic Listening Dots Animation */
+/* === Mic Listening Dots Animation === */
+.listening-dots {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 6px;
+    height: 28px;
+    cursor: pointer;
+    animation: fadeIn 0.3s ease-in-out;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
+.listening-dots span {
+    width: 8px;
+    height: 8px;
+    background-color: #2e7d32;
+    border-radius: 50%;
+    display: inline-block;
+    animation: bounce 1s infinite ease-in-out;
 }
 
-/* Active listening animation */
-.mic-active {
-    color: #d32f2f !important;
-    transform: scale(1.2);
+.listening-dots span:nth-child(2) {
+    animation-delay: 0.2s;
 }
 
-/* Error state */
-.mic-error {
-    color: #ff1744 !important;
-    animation: shake 0.5s;
+.listening-dots span:nth-child(3) {
+    animation-delay: 0.4s;
 }
 
-@keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(5px); }
-    50% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-    100% { transform: translateX(0); }
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-8px);
+    }
 }
 
-/* Timeout warning */
-@keyframes timeout-flash {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+/* Mic Listening Animation */
+.listening-dots {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 8px;
 }
 
-.timeout-warning {
-    animation: timeout-flash 1s infinite;
+.listening-dots span {
+    width: 6px;
+    height: 6px;
+    background: #388e3c;
+    border-radius: 50%;
+    animation: dot-bounce 1.2s infinite ease-in-out;
 }
 
-/* Keep existing listening-dots styles */
+.listening-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.listening-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dot-bounce {
+    0%, 80%, 100% { 
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-6px);
+    }
+}

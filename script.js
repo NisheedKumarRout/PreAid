@@ -1,3 +1,4 @@
+// Check if Speech Recognition is supported
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
@@ -8,46 +9,55 @@ if (!SpeechRecognition) {
     recognition.interimResults = false;
     recognition.continuous = false;
 
+    // DOM Elements
     const healthIssueInput = document.getElementById("health-issue");
     const getAdviceButton = document.getElementById("get-advice");
     const adviceResult = document.getElementById("advice-result");
     const micButton = document.getElementById("mic-button");
     const micContainer = document.querySelector(".mic-container");
 
-    // ✅ MIC ANIMATION LOGIC
     let isListening = false;
-    let timeoutId;
+    let listeningTimeout = null;
 
     function startListening() {
         isListening = true;
         recognition.start();
+        micButton.style.display = "none";
 
-        // Hide mic button and show dots
-        micButton.style.display = 'none';
-        const dots = document.createElement('div');
-        dots.className = 'listening-dots';
-        dots.innerHTML = '<span></span><span></span><span></span>';
+        const dots = document.createElement("div");
+        dots.classList.add("listening-dots");
+        dots.innerHTML = "<span></span><span></span><span></span>";
+
+        dots.addEventListener("click", stopListening);
+
+        // Force animation trigger
+        void dots.offsetHeight;
+
         micContainer.appendChild(dots);
 
-        // Set timeout for automatic stop
-        timeoutId = setTimeout(() => {
-            if (isListening) stopListening();
-        }, 5000);
+        // Stop listening automatically after 7 seconds (fallback)
+        listeningTimeout = setTimeout(() => {
+            stopListening();
+        }, 7000);
     }
 
     function stopListening() {
         if (!isListening) return;
+
         isListening = false;
-
-        clearTimeout(timeoutId);
         recognition.stop();
+        micButton.style.display = "inline";
 
-        // Remove dots and show mic button
-        const dots = micContainer.querySelector('.listening-dots');
+        const dots = document.querySelector(".listening-dots");
         if (dots) dots.remove();
-        micButton.style.display = 'block';
+
+        if (listeningTimeout) {
+            clearTimeout(listeningTimeout);
+            listeningTimeout = null;
+        }
     }
 
+    // Mic button click
     micButton.addEventListener("click", () => {
         if (!isListening) {
             startListening();
@@ -56,11 +66,11 @@ if (!SpeechRecognition) {
         }
     });
 
+    // Speech recognition result
     recognition.onresult = (event) => {
         const speechResult = event.results[0][0].transcript;
         healthIssueInput.value = speechResult;
         getAdviceButton.click();
-        stopListening();
     };
 
     recognition.onend = () => {
@@ -68,11 +78,11 @@ if (!SpeechRecognition) {
     };
 
     recognition.onerror = (event) => {
-        stopListening();
         alert("Speech recognition error: " + event.error);
+        stopListening();
     };
 
-    // Rest of your existing code (getHealthAdvice, displayAdvice, etc.)
+    // Get health advice from API
     async function getHealthAdvice(issue) {
         const API_KEY = "AIzaSyDJP_zSrVOGFPrN0aNqeiGEiGexzAe0aNQ";
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
