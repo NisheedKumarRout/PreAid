@@ -52,7 +52,8 @@ if (!SpeechRecognition) {
     // Function to fetch health advice
     async function getHealthAdvice(issue) {
         const API_KEY = "AIzaSyDJP_zSrVOGFPrN0aNqeiGEiGexzAe0aNQ";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        const API_URL =  `https://corsproxy.io/?https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+`;
 
         try {
             const response = await fetch(API_URL, {
