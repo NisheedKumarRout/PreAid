@@ -50,34 +50,34 @@ if (!SpeechRecognition) {
     };
 
     // Function to fetch health advice
-    async function getHealthAdvice(issue) {
-        const API_KEY = "AIzaSyDJP_zSrVOGFPrN0aNqeiGEiGexzAe0aNQ";
-        const API_URL =  `https://corsproxy.io/?https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
-`;
+  async function getHealthAdvice(issue) {
+    const API_KEY = "your_new_api_key_here"; // use the latest valid key
+    const API_URL = `https://corsproxy.io/?https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-        try {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `Provide first aid or health advice for: ${issue}`,
-                        }],
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `Provide first aid or health advice for: ${issue}`,
                     }],
-                }),
-            });
+                }],
+            }),
+        });
 
-            const data = await response.json();
-            if (response.ok) {
-                return data.candidates[0].content.parts[0].text;
-            } else {
-                throw new Error(data.error.message || "Failed to fetch advice");
-            }
-        } catch (error) {
-            return `Error: ${error.message}`;
+        const data = await response.json();
+        if (response.ok) {
+            return data.candidates[0].content.parts[0].text;
+        } else {
+            throw new Error(data.error.message || "Failed to fetch advice");
         }
+    } catch (error) {
+        return `Error: ${error.message}`;
     }
+}
+
 
     // Function to display advice
     function displayAdvice(advice) {
