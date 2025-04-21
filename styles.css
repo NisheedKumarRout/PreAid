@@ -312,3 +312,46 @@ body {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     backdrop-filter: blur(6px);
 }
+/* Mic Listening States */
+.mic-listening {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Active listening animation */
+.mic-active {
+    color: #d32f2f !important;
+    transform: scale(1.2);
+}
+
+/* Error state */
+.mic-error {
+    color: #ff1744 !important;
+    animation: shake 0.5s;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(5px); }
+    50% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Timeout warning */
+@keyframes timeout-flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.timeout-warning {
+    animation: timeout-flash 1s infinite;
+}
+
+/* Keep existing listening-dots styles */

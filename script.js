@@ -1,4 +1,3 @@
-// Check if Speech Recognition is supported
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
@@ -6,85 +5,106 @@ if (!SpeechRecognition) {
 } else {
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
-    recognition.interimResults = false; // Only get final speech results
-    recognition.continuous = false; // Stop after capturing speech
+    recognition.interimResults = false;
+    recognition.continuous = false;
 
-    // DOM Elements
     const healthIssueInput = document.getElementById("health-issue");
     const getAdviceButton = document.getElementById("get-advice");
     const adviceResult = document.getElementById("advice-result");
     const micButton = document.getElementById("mic-button");
+    const micContainer = document.querySelector(".mic-container");
 
+    // ✅ MIC ANIMATION LOGIC
     let isListening = false;
+    let timeoutId;
 
-    // Click event to start/stop speech recognition
+    function startListening() {
+        isListening = true;
+        recognition.start();
+
+        // Hide mic button and show dots
+        micButton.style.display = 'none';
+        const dots = document.createElement('div');
+        dots.className = 'listening-dots';
+        dots.innerHTML = '<span></span><span></span><span></span>';
+        micContainer.appendChild(dots);
+
+        // Set timeout for automatic stop
+        timeoutId = setTimeout(() => {
+            if (isListening) stopListening();
+        }, 5000);
+    }
+
+    function stopListening() {
+        if (!isListening) return;
+        isListening = false;
+
+        clearTimeout(timeoutId);
+        recognition.stop();
+
+        // Remove dots and show mic button
+        const dots = micContainer.querySelector('.listening-dots');
+        if (dots) dots.remove();
+        micButton.style.display = 'block';
+    }
+
     micButton.addEventListener("click", () => {
         if (!isListening) {
-            recognition.start();
-            micButton.textContent = "🎙️ Listening...";
-            isListening = true;
+            startListening();
         } else {
-            recognition.stop();
-            micButton.textContent = "🎤"; // Reset button after stopping
-            isListening = false;
+            stopListening();
         }
     });
 
-    // Capture speech and insert into input field
     recognition.onresult = (event) => {
         const speechResult = event.results[0][0].transcript;
         healthIssueInput.value = speechResult;
+        getAdviceButton.click();
+        stopListening();
     };
 
-    // When recognition ends, reset the mic button
     recognition.onend = () => {
-        micButton.textContent = "🎤";
-        isListening = false;
+        stopListening();
     };
 
-    // Handle errors
     recognition.onerror = (event) => {
+        stopListening();
         alert("Speech recognition error: " + event.error);
-        micButton.textContent = "🎤";
-        isListening = false;
     };
 
-    // Function to fetch health advice
-  async function getHealthAdvice(issue) {
-    const API_KEY = "your_new_api_key_here"; // use the latest valid key
-    const API_URL = `https://corsproxy.io/?https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+    // Rest of your existing code (getHealthAdvice, displayAdvice, etc.)
+    async function getHealthAdvice(issue) {
+        const API_KEY = "AIzaSyDJP_zSrVOGFPrN0aNqeiGEiGexzAe0aNQ";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{
-                        text: `Provide first aid or health advice for: ${issue}`,
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [{
+                            text: `Provide first aid or health advice for: ${issue}`,
+                        }],
                     }],
-                }],
-            }),
-        });
+                }),
+            });
 
-        const data = await response.json();
-        if (response.ok) {
-            return data.candidates[0].content.parts[0].text;
-        } else {
-            throw new Error(data.error.message || "Failed to fetch advice");
+            const data = await response.json();
+            if (response.ok) {
+                return data.candidates[0].content.parts[0].text;
+            } else {
+                throw new Error(data.error.message || "Failed to fetch advice");
+            }
+        } catch (error) {
+            return `Error: ${error.message}`;
         }
-    } catch (error) {
-        return `Error: ${error.message}`;
     }
-}
 
-
-    // Function to display advice
     function displayAdvice(advice) {
         adviceResult.innerHTML = advice;
     }
 
-    // Get Advice button event
     getAdviceButton.addEventListener("click", async () => {
         const issue = healthIssueInput.value.trim();
         if (!issue) {
@@ -96,7 +116,6 @@ if (!SpeechRecognition) {
         displayAdvice(advice);
     });
 
-    // Enter key triggers Get Advice
     healthIssueInput.addEventListener("keypress", async (e) => {
         if (e.key === "Enter") {
             getAdviceButton.click();
