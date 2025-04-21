@@ -2,7 +2,7 @@
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
-    alert("Your browser does not support speech recognition. Try using Chrome.");
+    alert("Your browser does not support speech recognition. Try using Chrome on desktop.");
 } else {
     const recognition = new SpeechRecognition();
     recognition.lang = "en-US";
